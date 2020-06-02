@@ -23,11 +23,12 @@ magrib = ''
 isya = ''
 tengah_malam = ''
 
-masehi=''
-hijriah=''
+masehi = ''
+hijriah = ''
 
-sumber=''
-metode=''
+sumber = ''
+metode =''
+ud_jam = ''
 
 label_judul = ttk.Label(win, text="Jadwal Shalat Kota Medan Hari Ini",
                         font=("calibri", 40, 'bold'),
@@ -36,7 +37,6 @@ label_judul = ttk.Label(win, text="Jadwal Shalat Kota Medan Hari Ini",
 label_judul.grid(column=0, row=0, columnspan = 7)
 
 footer = ttk.Label(win, font=("calibri", 12),
-                   #background = 'green',
                    foreground = 'green')
 footer.grid(column=0, row=4, columnspan = 7)
 
@@ -85,7 +85,8 @@ print("Jadwal Shalat Hari Ini, Subuh: "
 def tick():
     r = http.request('GET', url)
     encode = json.loads(r.data)
-    #print(data)
+
+    ud_jam = strftime("%H:%M")
 
     jadwal = encode['results']['datetime']
     hasil = encode['results']['settings']
@@ -107,29 +108,36 @@ def tick():
         masehi = data['date']['gregorian']
         hijriah = data['date']['hijri']
 
-    jw_subuh.configure(text=subuh)
     jw_imsak.configure(text=imsak)
+    jw_subuh.configure(text=subuh)
     jw_terbit.configure(text=terbit)
     jw_zuhur.configure(text=zuhur)
     jw_ashar.configure(text=ashar)
     jw_magrib.configure(text=magrib)
     jw_isya.configure(text=isya)
 
-    footer.configure(text="Sumber: " + sumber + " - Metode: " + metode)
+    if ud_jam == imsak:
+        jw_imsak.configure(foreground = 'red')
+    elif ud_jam == subuh:
+        jw_subuh.configure(foreground = 'red')
+    elif ud_jam == zuhur:
+        jw_zuhur.configure(foreground = 'red')
+    elif ud_jam == ashar:
+        jw_ashar.configure(foreground = 'red')
+    elif ud_jam == magrib:
+        jw_magrib.configure(foreground = 'red')
+    elif ud_jam == isya:
+        jw_isya.configure(foreground = 'red') 
 
-    #ud_tanggal = strftime("%d/%m/%Y")
-    #ud_jam = strftime("%H:%M")
-    label_jam.configure(text = "Tanggal: " + masehi + " M / "
-                        + hijriah + " H - Jam: " + strftime("%H:%M"))
     
-    #label_jam.grid(column=0, row=1, columnspan = 7)
+    footer.configure(text="Sumber: " + sumber + " - Metode: " + metode)
+    
+    label_jam.configure(text = "Tanggal: " + masehi + " M / "
+                        + hijriah + " H - Jam: " + ud_jam)
     label_jam.after(1000, tick)
 
 label_jam = ttk.Label(win,  font=("calibri", 20))
 label_jam.grid(column=0, row=1, columnspan = 7)
 
-
 tick()
 win.mainloop()
-
-
